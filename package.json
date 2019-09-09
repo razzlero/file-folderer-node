@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "main": "main.js",
   "scripts": {
+    "start": "node src/main.js ./s",
     "test": "jest --verbose"
   },
   "devDependencies": {
