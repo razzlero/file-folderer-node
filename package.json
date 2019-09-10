@@ -1,10 +1,14 @@
 {
   "name": "file-folderer",
   "version": "0.1.0",
+  "description": "A tool for sorting files into folders",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/main.js -f testFile -d testDir",
+    "start": "node src/index.js -f testFile -d testDir",
     "test": "jest --verbose"
   },
+  "author": "Razzlero",
+  "license": "MIT",
   "devDependencies": {
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",
