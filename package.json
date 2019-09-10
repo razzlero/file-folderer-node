@@ -1,9 +1,8 @@
 {
   "name": "file-folderer",
   "version": "0.1.0",
-  "main": "main.js",
   "scripts": {
-    "start": "node src/main.js ./s",
+    "start": "node src/main.js -f testFile -d testDir",
     "test": "jest --verbose"
   },
   "devDependencies": {
@@ -15,6 +14,7 @@
     "eslint-plugin-react-hooks": "^1.7.0"
   },
   "dependencies": {
+    "commander": "^3.0.1",
     "jest": "^24.9.0"
   }
 }
