@@ -2,10 +2,12 @@
   "name": "file-folderer",
   "version": "0.1.0",
   "description": "A tool for sorting files into folders",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/index.js -f testFile -d testDir",
     "test": "jest --verbose"
+  },
+  "bin": {
+    "file-folderer": "./index.js"
   },
   "author": "Razzlero",
   "license": "MIT",
@@ -16,6 +18,6 @@
     "jest": "^24.9.0"
   },
   "dependencies": {
-    "commander": "^3.0.1"
+    "commander": "^3.0.2"
   }
 }
