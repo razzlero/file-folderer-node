@@ -23,11 +23,11 @@ program
 //  .command('file <fileToFolder>')
 //  .alias('f')
 //  .description('Move a file into a subfolder with the closest matching name.')
-//  .action((fileToFolder) => {  
-//	const parentDir = path.dirname(fileToFolder);
-//	console.log(parentDir);
+//  .action((fileToFolder) => {
+//  const parentDir = path.dirname(fileToFolder);
+//  console.log(parentDir);
 //    //TODO
-//	console.log("TODO");
+//  console.log("TODO");
 //  });
 
 program.parse(process.argv);
@@ -36,7 +36,7 @@ console.log(program.opts())
 
 if (program.file) {
   console.log('Process single file');
-  console.log("TODO");
+  console.log('TODO');
 }
 
 
