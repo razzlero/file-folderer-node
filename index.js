@@ -1,7 +1,20 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const fs = require('fs');
+const { readdirSync } = require('fs');
+
+
+function getDirSubDirectories(source) {
+  return readdirSync(source, { withFileTypes: true })
+    .filter((entity) => entity.isDirectory())
+    .map((dir) => dir.name);
+}
+
+function getDirFiles(source) {
+  return readdirSync(source, { withFileTypes: true })
+    .filter((entity) => entity.isFile())
+    .map((file) => file.name);
+}
 
 program
   .version('0.0.1')
@@ -14,21 +27,17 @@ program
     console.log(processDir);
 
     if (files) {
-      console.log('argument files');
+      console.log('argument files:');
       console.log(files);
     }
 
-    fs.readdir(processDir, (err, dirFiles) => {
-      console.log('dir files');
-      dirFiles.forEach((file) => {
-        console.log(file);
-      });
-    });
+    const subDirs = getDirSubDirectories(processDir);
+    console.log('Subdirectories:');
+    console.log(subDirs);
 
-    if (program.file) {
-      console.log('Process single file');
-      console.log(program.file);
-    }
+    const dirFiles = getDirFiles(processDir);
+    console.log('Dir Files:');
+    console.log(dirFiles);
   })
   .parse(process.argv);
 
