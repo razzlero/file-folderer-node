@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { readdirSync } = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 // TODO: make this script so that it will work from the sendto menu
@@ -19,7 +19,7 @@ function main() {
 
   const matchingDirName = findMatchingDirName(filePaths)
   if (matchingDirName !== null) {
-    // TODO: move files into that folder
+    moveFiles(filePaths, matchingDirName)
   } else if (filePaths.length > 1) {
     // TODO: Find longest common string, make folder with that name, move files into it
   } else {
@@ -55,25 +55,25 @@ function fixPath(inPath) {
 
 function findMatchingDirName(filePaths) {
   // First check if the file names match any directory
-  const fileNames = getFileNames(filePaths)
+  const fileNames = getFileNames(filePaths);
   const dirPath =  path.dirname(filePaths[0]);
-  const subDirNames = getSubDirNames(dirPath)
+  const subDirNames = getSubDirNames(dirPath);
   // Sort subDirNames length, from longest to shortest
   subDirNames.sort((a, b) => (b.length - a.length));
 
-  let matchDir = null
+  let matchDir = null;
   for (let i = 0; i < subDirNames.length && matchDir === null; i++) {
     const subDirName = subDirNames[i];
     const allMatch = fileNames.every((fileName) => (fileName.includes(subDirName)))
     if (allMatch) {
-      matchDir = subDirName
+      matchDir = subDirName;
     }
   }
-  return matchDir
+  return matchDir;
 }
 
 function getSubDirNames(source) {
-  return readdirSync(source, { withFileTypes: true })
+  return fs.readdirSync(source, { withFileTypes: true })
     .filter((entity) => entity.isDirectory())
     .map((dir) => dir.name);
 }
@@ -82,6 +82,17 @@ function getFileNames(filePaths) {
   return filePaths.map((filePath) => (
     path.basename(filePath)
   ))
+}
+
+function moveFiles(filePaths, subDirName) {
+  const dirPath =  path.dirname(filePaths[0]);
+  filePaths.forEach((filePath) => {
+    const fileName = path.basename(filePath);
+    const targetPath = path.join(dirPath, subDirName, fileName);
+    fs.rename(filePath, targetPath, (err) => {
+      if (err) throw err;
+    });
+  })
 }
 
 main();
