@@ -8,20 +8,24 @@ const path = require('path');
 // when calling the first argv item will be node, then this script, then the full path to all the files selected
 // Probably don't need to bother with commander
 
-// The args contain this script, anything which called this script, and the file paths passed as parameters.
-// So first we want to get only those file paths
-const filePaths = getArgFiles(process.argv);
+function main() {
+  // The args contain this script, anything which called this script, and the file paths passed as parameters.
+  // So first we want to get only those file paths
+  const filePaths = getArgFiles(process.argv);
 
-if (filePaths.length === 0) {
-  throw new Error("No file paths provided")
+  if (filePaths.length === 0) {
+    throw new Error("No file paths provided")
+  }
+
+  const matchingDirName = findMatchingDirName(filePaths)
+  if (matchingDirName !== null) {
+    // TODO: move files into that folder
+  } else if (filePaths.length > 1) {
+    // TODO: Find longest common string, make folder with that name, move files into it
+  } else {
+    throw new Error("Unable to move file(s) to folder.")
+  }
 }
-
-const dirPath =  path.dirname(filePaths[0]);
-console.log(dirPath)
-const subDirs = getSubDirs(dirPath)
-
-console.log(subDirs)
-
 
 function getArgFiles(args) {
   const scriptName = path.basename(__filename);
@@ -49,8 +53,35 @@ function fixPath(inPath) {
   return path.normalize(inPath.split(path.sep).join(path.posix.sep))
 }
 
-function getSubDirs(source) {
+function findMatchingDirName(filePaths) {
+  // First check if the file names match any directory
+  const fileNames = getFileNames(filePaths)
+  const dirPath =  path.dirname(filePaths[0]);
+  const subDirNames = getSubDirNames(dirPath)
+  // Sort subDirNames length, from longest to shortest
+  subDirNames.sort((a, b) => (b.length - a.length));
+
+  let matchDir = null
+  for (let i = 0; i < subDirNames.length && matchDir === null; i++) {
+    const subDirName = subDirNames[i];
+    const allMatch = fileNames.every((fileName) => (fileName.includes(subDirName)))
+    if (allMatch) {
+      matchDir = subDirName
+    }
+  }
+  return matchDir
+}
+
+function getSubDirNames(source) {
   return readdirSync(source, { withFileTypes: true })
     .filter((entity) => entity.isDirectory())
     .map((dir) => dir.name);
 }
+
+function getFileNames(filePaths) {
+  return filePaths.map((filePath) => (
+    path.basename(filePath)
+  ))
+}
+
+main();
