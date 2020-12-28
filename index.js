@@ -3,10 +3,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// TODO: make this script so that it will work from the sendto menu
-// Just need to add a shortcut in sendto to call the script
-// when calling the first argv item will be node, then this script, then the full path to all the files selected
-// Probably don't need to bother with commander
 
 function main() {
   // The args contain this script, anything which called this script, and the file paths passed as parameters.
@@ -21,41 +17,46 @@ function main() {
   if (matchingDirName !== null) {
     moveFiles(filePaths, matchingDirName)
   } else if (filePaths.length > 1) {
-    // TODO: Find longest common string, make folder with that name, move files into it
+    const fileNames = getFileNames(filePaths);
+    const targetDirName = findLongestCommonString(fileNames);
+    if (!targetDirName) {
+      throw new Error("Unable to determine common folder name.")
+    }
+    moveFiles(filePaths, targetDirName)
   } else {
-    throw new Error("Unable to move file(s) to folder.")
+    throw new Error("Unable to move file(s) to folder.");
   }
 }
 
 function getArgFiles(args) {
   const scriptName = path.basename(__filename);
-  let scriptFound = false
+  let scriptFound = false;
   const filePaths = []
   for (let i = 0; i < args.length; i++) {
     const filePath = fixPath(args[i]);
     const fileName = path.basename(filePath);
     if (scriptFound) {
-      filePaths.push(filePath)
+      filePaths.push(filePath);
     } else if (fileName === scriptName) {
-      scriptFound = true
+      scriptFound = true;
     }
   }
 
   if (!scriptFound) {
-    throw new Error("Script not found in arguments")
+    throw new Error("Script not found in arguments");
   }
 
-  return filePaths
+  return filePaths;
 }
 
 // Makes sure that paths are in a standardized format which will be handled correctly.
 function fixPath(inPath) {
-  return path.normalize(inPath.split(path.sep).join(path.posix.sep))
+  return path.normalize(inPath.split(path.sep).join(path.posix.sep));
 }
 
 function findMatchingDirName(filePaths) {
   // First check if the file names match any directory
-  const fileNames = getFileNames(filePaths);
+  const fileNames = getFileBaseNames(filePaths);
   const dirPath =  path.dirname(filePaths[0]);
   const subDirNames = getSubDirNames(dirPath);
   // Sort subDirNames length, from longest to shortest
@@ -64,7 +65,7 @@ function findMatchingDirName(filePaths) {
   let matchDir = null;
   for (let i = 0; i < subDirNames.length && matchDir === null; i++) {
     const subDirName = subDirNames[i];
-    const allMatch = fileNames.every((fileName) => (fileName.includes(subDirName)))
+    const allMatch = fileNames.every((fileName) => (fileName.includes(subDirName)));
     if (allMatch) {
       matchDir = subDirName;
     }
@@ -78,21 +79,33 @@ function getSubDirNames(source) {
     .map((dir) => dir.name);
 }
 
-function getFileNames(filePaths) {
+function getFileBaseNames(filePaths) {
   return filePaths.map((filePath) => (
     path.basename(filePath)
   ))
 }
 
+function getFileNames(filePaths) {
+  return filePaths.map((filePath) => (
+    path.parse(filePath).name
+  ))
+}
+
 function moveFiles(filePaths, subDirName) {
   const dirPath =  path.dirname(filePaths[0]);
+  const targetDir = path.join(dirPath, subDirName);
+  if (!fs.existsSync(targetDir)){
+    fs.mkdirSync(targetDir);
+  }
   filePaths.forEach((filePath) => {
     const fileName = path.basename(filePath);
-    const targetPath = path.join(dirPath, subDirName, fileName);
-    fs.rename(filePath, targetPath, (err) => {
-      if (err) throw err;
-    });
+    const targetPath = path.join(targetDir, fileName);
+    fs.renameSync(filePath, targetPath);
   })
+}
+
+function findLongestCommonString(fileNames) {
+  // TODO
 }
 
 main();
