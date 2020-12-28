@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { setgroups } = require('process');
 
 
 function main() {
@@ -105,7 +106,25 @@ function moveFiles(filePaths, subDirName) {
 }
 
 function findLongestCommonString(fileNames) {
+  // Sort from smallest name to biggest because the longest substring can't be longer than the smallest name
+  fileNames.sort((a, b) => (a.length - b.length));
   // TODO
+  // could take a pretty naive approach of getting every substring of the first file name and checking if they exist in all other filenames
+  // It will have bad performance, but I don't think it will matter,and  in exchange it will keep this script more readable.
+}
+
+// Gets all substrings of a given size in a string
+function getSubStrings(str, size) {
+  const subs = [];
+  for (let i = 0; i + size <= str.length; i++) {
+    const sub = str.substring(i, i + size)
+    subs.push(sub);
+  }
+  return subs;
+}
+
+function allIncludes(stringList, targetStr) {
+  return stringList.every((str) => (str.includes(targetStr)))
 }
 
 main();
