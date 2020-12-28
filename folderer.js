@@ -18,8 +18,7 @@ function main() {
   if (matchingDirName !== null) {
     moveFiles(filePaths, matchingDirName)
   } else if (filePaths.length > 1) {
-    const fileNames = getFileNames(filePaths);
-    const targetDirName = findLongestCommonString(fileNames);
+    const targetDirName = findCommonName(filePaths);
     if (!targetDirName) {
       throw new Error("Unable to determine common folder name.")
     }
@@ -105,12 +104,22 @@ function moveFiles(filePaths, subDirName) {
   })
 }
 
-function findLongestCommonString(fileNames) {
+// Finds a common name between files to use as their folder name
+function findCommonName(filePaths) {
+  const fileNames = getFileNames(filePaths);
   // Sort from smallest name to biggest because the longest substring can't be longer than the smallest name
   fileNames.sort((a, b) => (a.length - b.length));
-  // TODO
-  // could take a pretty naive approach of getting every substring of the first file name and checking if they exist in all other filenames
-  // It will have bad performance, but I don't think it will matter,and  in exchange it will keep this script more readable.
+  const smallestName = fileNames.shift()
+  // TODO: Decide on a minimum size, or make it configurable
+  let commonName = null
+  for (let i = smallestName.length; !commonName && i > 0; i-- ) {
+    const subs = getSubStrings(smallestName, i);
+    commonName = subs.find((sub) => (allIncludes(fileNames, sub)));
+  }
+  if (commonName) {
+    commonName = commonName.trim()
+  }
+  return commonName;
 }
 
 // Gets all substrings of a given size in a string
