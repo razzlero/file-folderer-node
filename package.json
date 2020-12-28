@@ -21,7 +21,5 @@
     "jest": "^24.9.0"
   },
   "dependencies": {
-    "commander": "^3.0.2",
-    "mock-fs": "^4.10.1"
   }
 }

@@ -1,52 +1,57 @@
 #!/usr/bin/env node
 
-const program = require('commander');
+const { exception } = require('console');
 const { readdirSync } = require('fs');
+const path = require('path');
+
+// TODO: make this script so that it will work from the sendto menu
+// Just need to add a shortcut in sendto to call the script
+// when calling the first argv item will be node, then this script, then the full path to all the files selected
+// Probably don't need to bother with commander
+
+// The args contain this script, anything which called this script, and the file paths passed as parameters.
+// So first we want to get only those file paths
+const filePaths = getArgFiles(process.argv);
+
+if (filePaths.length === 0) {
+  throw exception("No file paths provided")
+}
+
+const dirPath =  path.dirname(filePaths[0]);
+console.log(dirPath)
+const subDirs = getSubDirs(dirPath)
+
+console.log(subDirs)
 
 
-function getDirSubDirectories(source) {
+function getArgFiles(args) {
+  const scriptName = path.basename(__filename);
+  let scriptFound = false
+  const filePaths = []
+  for (let i = 0; i < args.length; i++) {
+    const filePath = fixPath(args[i]);
+    const fileName = path.basename(filePath);
+    if (scriptFound) {
+      filePaths.push(filePath)
+    } else if (fileName === scriptName) {
+      scriptFound = true
+    }
+  }
+
+  if (!scriptFound) {
+    throw exception("Script not found in arguments")
+  }
+
+  return filePaths
+}
+
+// Makes sure that paths are in a standardized format which will be handled correctly.
+function fixPath(inPath) {
+  return path.normalize(inPath.split(path.sep).join(path.posix.sep))
+}
+
+function getSubDirs(source) {
   return readdirSync(source, { withFileTypes: true })
     .filter((entity) => entity.isDirectory())
     .map((dir) => dir.name);
 }
-
-function getDirFiles(source) {
-  return readdirSync(source, { withFileTypes: true })
-    .filter((entity) => entity.isFile())
-    .map((file) => file.name);
-}
-
-program
-  .version('0.0.1')
-  .description('File Folderer')
-  .arguments('[files...]')
-  .option('-d, --directory <directoryPath>', 'Directory to process')
-  .action((files) => {
-    const processDir = program.directory || './';
-    console.log('dir:');
-    console.log(processDir);
-
-    if (files) {
-      console.log('argument files:');
-      console.log(files);
-    }
-
-    const subDirs = getDirSubDirectories(processDir);
-    console.log('Subdirectories:');
-    console.log(subDirs);
-
-    const dirFiles = getDirFiles(processDir);
-    console.log('Dir Files:');
-    console.log(dirFiles);
-  })
-  .parse(process.argv);
-
-// Very useful looking article, includes commander
-// https://blog.developer.atlassian.com/scripting-with-node/
-
-// TODO: take a directory by default. take an optional file name/list for specific files to process
-// if no files are specified processes all files in the folder.
-
-// Maybe if no directory is specified do the current directory?
-// Add  dry run option
-// Maybe stop for confirmation by default unless a -y flag is given (could use inquirer for asking)
