@@ -1,25 +1,23 @@
 {
-  "name": "file-folderer",
+  "name": "folderer",
   "version": "0.1.0",
   "description": "A tool for sorting files into folders",
-  "main": "index.js",
+  "main": "folderer.js",
   "scripts": {
-    "test": "jest --verbose"
+    "build": "pkg . --targets win"
   },
   "bin": {
-    "file-folderer": "./index.js"
+    "folderer": "./folderer.js"
   },
   "author": "Razzlero",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^1.7.0",
-    "jest": "^24.9.0"
+    "eslint": "^7.16.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-promise": "^4.2.1"
   },
   "dependencies": {
+    "pkg": "^4.4.9"
   }
 }
