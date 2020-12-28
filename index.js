@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const { exception } = require('console');
 const { readdirSync } = require('fs');
 const path = require('path');
 
@@ -14,7 +13,7 @@ const path = require('path');
 const filePaths = getArgFiles(process.argv);
 
 if (filePaths.length === 0) {
-  throw exception("No file paths provided")
+  throw new Error("No file paths provided")
 }
 
 const dirPath =  path.dirname(filePaths[0]);
@@ -39,7 +38,7 @@ function getArgFiles(args) {
   }
 
   if (!scriptFound) {
-    throw exception("Script not found in arguments")
+    throw new Error("Script not found in arguments")
   }
 
   return filePaths
