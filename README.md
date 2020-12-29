@@ -1,6 +1,6 @@
 # File Folderer Node
 
-This is an evolution of my previous file-folderer project. the aim of both projects is to give a convenient way of sorting files into folders based on the file names.
+This is an evolution of my previous [file-folderer](https://github.com/razzlero/file-folderer) project. the aim of both projects is to give a convenient way of sorting files into folders based on the file names.
 
 This version of file folderer has no UI of it's own, but is instead intended to be used from the windows "Send to" context menu item.
 
