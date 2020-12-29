@@ -9,7 +9,7 @@ This version of file folderer has no UI of it's own, but is instead intended to 
     - [1 - Easiest way](#1---easiest-way)
     - [2 - Easy: Better way](#2---easy-better-way)
     - [3 - Advanced: Building folderer.exe yourself](#3---advanced-building-foldererexe-yourself)
-    - [4- Advanced: Use folderer.js without building](#4--advanced-use-foldererjs-without-building)
+    - [4 - Advanced: Use folderer.js without building](#4---advanced-use-foldererjs-without-building)
   - [Usage](#usage)
     - [What happens](#what-happens)
     - [Usage Notes](#usage-notes)
@@ -38,7 +38,7 @@ It's that simple, but the context menu item will say "folderer.exe", and that fo
 - run this command: `npm run build`
 - Then follow either method 1 or 2 with the folderer.exe that was crated
 
-### 4- Advanced: Use folderer.js without building
+### 4 - Advanced: Use folderer.js without building
 
 - Install [nodejs](https://nodejs.org/en/download/) if you have not already installed it
 - Download `folderer.js` from the releases page (or from the repo).
