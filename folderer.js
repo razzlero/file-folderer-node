@@ -2,12 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { setgroups } = require('process');
-
 
 function main() {
-  // The args contain this script, anything which called this script, and the file paths passed as parameters.
-  // So first we want to get only those file paths
   const filePaths = getArgFiles(process.argv);
 
   if (filePaths.length === 0) {
@@ -28,6 +24,8 @@ function main() {
   }
 }
 
+// Get the list of passed in file names from the args.
+// Basically gets all args after the name of the current script.
 function getArgFiles(args) {
   const scriptName = path.basename(__filename);
   let scriptFound = false;
@@ -54,9 +52,11 @@ function fixPath(inPath) {
   return path.normalize(inPath.split(path.sep).join(path.posix.sep));
 }
 
+// Given a list of files paths (assumed to be in the same directory) returns a folder in the same directory
+// which the files could be moved to. If no suitable folder is found returns null.
 function findMatchingDirName(filePaths) {
   // First check if the file names match any directory
-  const fileNames = getFileBaseNames(filePaths);
+  const fileNames = getFileNames(filePaths);
   const dirPath =  path.dirname(filePaths[0]);
   const subDirNames = getSubDirNames(dirPath);
   // Sort subDirNames length, from longest to shortest
@@ -73,24 +73,21 @@ function findMatchingDirName(filePaths) {
   return matchDir;
 }
 
-function getSubDirNames(source) {
-  return fs.readdirSync(source, { withFileTypes: true })
+// Returns a list of all folders in the given directory.
+function getSubDirNames(sourceDir) {
+  return fs.readdirSync(sourceDir, { withFileTypes: true })
     .filter((entity) => entity.isDirectory())
     .map((dir) => dir.name);
 }
 
-function getFileBaseNames(filePaths) {
-  return filePaths.map((filePath) => (
-    path.basename(filePath)
-  ))
-}
-
+// Given a list of fle paths returns a list of file names (with no file extension)
 function getFileNames(filePaths) {
   return filePaths.map((filePath) => (
     path.parse(filePath).name
   ))
 }
 
+// Given a list of files moves them into the folder with the given name.
 function moveFiles(filePaths, subDirName) {
   const dirPath =  path.dirname(filePaths[0]);
   const targetDir = path.join(dirPath, subDirName);

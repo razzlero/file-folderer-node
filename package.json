@@ -1,6 +1,6 @@
 {
   "name": "folderer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A tool for sorting files into folders",
   "main": "folderer.js",
   "scripts": {
@@ -15,9 +15,8 @@
     "eslint": "^7.16.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-promise": "^4.2.1"
-  },
-  "dependencies": {
+    "eslint-plugin-promise": "^4.2.1",
     "pkg": "^4.4.9"
-  }
+  },
+  "dependencies": {}
 }
