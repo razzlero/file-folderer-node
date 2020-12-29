@@ -24,7 +24,7 @@ If you are afraid of downloading an exe file you can follow method 3 or 4 instea
 
 - Move `folderer.exe` into `C:\Users\<yourusername>\AppData\Roaming\Microsoft\Windows\SendTo`
 
-It's that simple, but the context menu item will say "folderer.exe", and that menu is not really intended to store applications. So I recommend the following better approach.
+It's that simple, but the context menu item will say "folderer.exe", and that folder is not really intended to store applications. So I recommend the following better approach.
 
 ### 2 - Easy: Better way
 
