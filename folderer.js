@@ -3,18 +3,30 @@
 const fs = require('fs');
 const path = require('path');
 
+const ArgOption = {
+  IGNORE_TAGS: '--ignore-tags',
+};
+
+const defaultOptions = {
+  ignoreTags: false,
+};
+
 function main() {
-  const filePaths = getScriptArgs(process.argv);
+  const scriptArgs = getScriptArgs(process.argv);
+  const { options, filePaths } = parseScriptArgs(scriptArgs);
 
   if (filePaths.length === 0) {
     throw new Error('No file paths provided');
   }
 
-  const matchingDirName = findMatchingDirName(filePaths);
+  const fileNames = getFileNames(filePaths, options);
+  const dirPath = path.dirname(filePaths[0]);
+
+  const matchingDirName = findMatchingDirName(fileNames, dirPath);
   if (matchingDirName !== null) {
     moveFiles(filePaths, matchingDirName);
   } else if (filePaths.length > 1) {
-    const targetDirName = findCommonName(filePaths);
+    const targetDirName = findCommonName(fileNames);
     if (!targetDirName) {
       throw new Error('Unable to determine common folder name.');
     }
@@ -30,12 +42,14 @@ function getScriptArgs(allArgs) {
   let scriptFound = false;
   const scriptArgs = [];
   for (let i = 0; i < allArgs.length; i++) {
-    const filePath = fixPath(allArgs[i]);
-    const fileName = path.basename(filePath);
+    const fixedArg = fixPath(allArgs[i]);
     if (scriptFound) {
-      scriptArgs.push(filePath);
-    } else if (fileName === scriptName) {
-      scriptFound = true;
+      scriptArgs.push(fixedArg);
+    } else {
+      const fileName = path.basename(fixedArg);
+      if (fileName === scriptName) {
+        scriptFound = true;
+      }
     }
   }
 
@@ -51,12 +65,41 @@ function fixPath(inPath) {
   return path.normalize(inPath.split(path.sep).join(path.posix.sep));
 }
 
+// Given script args parses returns options and files.
+// Any arg which starts with a `-` is considered an option, and others are considered files.
+function parseScriptArgs(scriptArgs) {
+  const options = { ...defaultOptions };
+  const filePaths = [];
+  scriptArgs.forEach((arg) => {
+    if (arg.startsWith('-')) {
+      if (arg.toLowerCase() === ArgOption.IGNORE_TAGS) {
+        options.ignoreTags = true;
+      } else {
+        throw new Error(`Unrecognized option "${arg}"`);
+      }
+    } else {
+      filePaths.push(arg);
+    }
+  });
+  return { options, filePaths };
+}
+
+// Given a list of fle paths returns a list of file names (with no file extension)
+function getFileNames(filePaths, options) {
+  return filePaths.map((filePath) => {
+    let fileName = path.parse(filePath).name;
+    if (options.ignoreTags) {
+      // Remove square bracket [tags] from the filename
+      fileName = fileName.replace(/(\[.*?\])/g, '');
+    }
+    return fileName;
+  });
+}
+
 // Given a list of files paths (assumed to be in the same directory) returns a folder in the same
 // directory which the files could be moved to. If no suitable folder is found returns null.
-function findMatchingDirName(filePaths) {
+function findMatchingDirName(fileNames, dirPath) {
   // First check if the file names match any directory
-  const fileNames = getFileNames(filePaths);
-  const dirPath = path.dirname(filePaths[0]);
   const subDirNames = getSubDirNames(dirPath);
   // Sort subDirNames length, from longest to shortest
   subDirNames.sort((a, b) => (b.length - a.length));
@@ -79,13 +122,6 @@ function getSubDirNames(sourceDir) {
     .map((dir) => dir.name);
 }
 
-// Given a list of fle paths returns a list of file names (with no file extension)
-function getFileNames(filePaths) {
-  return filePaths.map((filePath) => (
-    path.parse(filePath).name
-  ));
-}
-
 // Given a list of files moves them into the folder with the given name.
 function moveFiles(filePaths, subDirName) {
   const dirPath = path.dirname(filePaths[0]);
@@ -101,8 +137,7 @@ function moveFiles(filePaths, subDirName) {
 }
 
 // Finds a common name between files to use as their folder name
-function findCommonName(filePaths) {
-  const fileNames = getFileNames(filePaths);
+function findCommonName(fileNames) {
   // Sort from smallest name to biggest because the longest substring can't be longer than the
   // smallest name
   fileNames.sort((a, b) => (a.length - b.length));
