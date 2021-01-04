@@ -4,47 +4,46 @@ const fs = require('fs');
 const path = require('path');
 
 function main() {
-  const filePaths = getArgFiles(process.argv);
+  const filePaths = getScriptArgs(process.argv);
 
   if (filePaths.length === 0) {
-    throw new Error("No file paths provided")
+    throw new Error('No file paths provided');
   }
 
-  const matchingDirName = findMatchingDirName(filePaths)
+  const matchingDirName = findMatchingDirName(filePaths);
   if (matchingDirName !== null) {
-    moveFiles(filePaths, matchingDirName)
+    moveFiles(filePaths, matchingDirName);
   } else if (filePaths.length > 1) {
     const targetDirName = findCommonName(filePaths);
     if (!targetDirName) {
-      throw new Error("Unable to determine common folder name.")
+      throw new Error('Unable to determine common folder name.');
     }
-    moveFiles(filePaths, targetDirName)
+    moveFiles(filePaths, targetDirName);
   } else {
-    throw new Error("Unable to move file(s) to folder.");
+    throw new Error('Unable to move file(s) to folder.');
   }
 }
 
-// Get the list of passed in file names from the args.
-// Basically gets all args after the name of the current script.
-function getArgFiles(args) {
+// Gets all args which appear after the script call
+function getScriptArgs(allArgs) {
   const scriptName = path.basename(__filename);
   let scriptFound = false;
-  const filePaths = []
-  for (let i = 0; i < args.length; i++) {
-    const filePath = fixPath(args[i]);
+  const scriptArgs = [];
+  for (let i = 0; i < allArgs.length; i++) {
+    const filePath = fixPath(allArgs[i]);
     const fileName = path.basename(filePath);
     if (scriptFound) {
-      filePaths.push(filePath);
+      scriptArgs.push(filePath);
     } else if (fileName === scriptName) {
       scriptFound = true;
     }
   }
 
   if (!scriptFound) {
-    throw new Error("Script not found in arguments");
+    throw new Error('Script not found in arguments');
   }
 
-  return filePaths;
+  return scriptArgs;
 }
 
 // Makes sure that paths are in a standardized format which will be handled correctly.
@@ -52,12 +51,12 @@ function fixPath(inPath) {
   return path.normalize(inPath.split(path.sep).join(path.posix.sep));
 }
 
-// Given a list of files paths (assumed to be in the same directory) returns a folder in the same directory
-// which the files could be moved to. If no suitable folder is found returns null.
+// Given a list of files paths (assumed to be in the same directory) returns a folder in the same
+// directory which the files could be moved to. If no suitable folder is found returns null.
 function findMatchingDirName(filePaths) {
   // First check if the file names match any directory
   const fileNames = getFileNames(filePaths);
-  const dirPath =  path.dirname(filePaths[0]);
+  const dirPath = path.dirname(filePaths[0]);
   const subDirNames = getSubDirNames(dirPath);
   // Sort subDirNames length, from longest to shortest
   subDirNames.sort((a, b) => (b.length - a.length));
@@ -84,37 +83,38 @@ function getSubDirNames(sourceDir) {
 function getFileNames(filePaths) {
   return filePaths.map((filePath) => (
     path.parse(filePath).name
-  ))
+  ));
 }
 
 // Given a list of files moves them into the folder with the given name.
 function moveFiles(filePaths, subDirName) {
-  const dirPath =  path.dirname(filePaths[0]);
+  const dirPath = path.dirname(filePaths[0]);
   const targetDir = path.join(dirPath, subDirName);
-  if (!fs.existsSync(targetDir)){
+  if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir);
   }
   filePaths.forEach((filePath) => {
     const fileName = path.basename(filePath);
     const targetPath = path.join(targetDir, fileName);
     fs.renameSync(filePath, targetPath);
-  })
+  });
 }
 
 // Finds a common name between files to use as their folder name
 function findCommonName(filePaths) {
   const fileNames = getFileNames(filePaths);
-  // Sort from smallest name to biggest because the longest substring can't be longer than the smallest name
+  // Sort from smallest name to biggest because the longest substring can't be longer than the
+  // smallest name
   fileNames.sort((a, b) => (a.length - b.length));
-  const smallestName = fileNames.shift()
+  const smallestName = fileNames.shift();
   // TODO: Decide on a minimum size, or make it configurable
-  let commonName = null
-  for (let i = smallestName.length; !commonName && i > 0; i-- ) {
+  let commonName = null;
+  for (let i = smallestName.length; !commonName && i > 0; i--) {
     const subs = getSubStrings(smallestName, i);
     commonName = subs.find((sub) => (allIncludes(fileNames, sub)));
   }
   if (commonName) {
-    commonName = commonName.trim()
+    commonName = commonName.trim();
   }
   return commonName;
 }
@@ -123,14 +123,14 @@ function findCommonName(filePaths) {
 function getSubStrings(str, size) {
   const subs = [];
   for (let i = 0; i + size <= str.length; i++) {
-    const sub = str.substring(i, i + size)
+    const sub = str.substring(i, i + size);
     subs.push(sub);
   }
   return subs;
 }
 
 function allIncludes(stringList, targetStr) {
-  return stringList.every((str) => (str.includes(targetStr)))
+  return stringList.every((str) => (str.includes(targetStr)));
 }
 
 main();
