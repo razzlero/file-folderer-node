@@ -6,6 +6,7 @@ This version of file folderer has no UI of it's own, but is instead intended to 
 
 - [File Folderer Node](#file-folderer-node)
   - [Installation](#installation)
+    - [Optional: Config Parameters](#optional-config-parameters)
     - [Optional: Building folderer.exe yourself](#optional-building-foldererexe-yourself)
   - [Usage](#usage)
     - [What happens](#what-happens)
@@ -17,6 +18,17 @@ This version of file folderer has no UI of it's own, but is instead intended to 
 - Move `folderer.exe` to any location where you don't expect it to move. (I personally use `C:\tools\folderer\folderer.exe` for example).
 - Create a shortcut to `folderer.exe` named `Folderer` and place that shortcut inside `C:\Users\<yourusername>\AppData\Roaming\Microsoft\Windows\SendTo`.
 
+### Optional: Config Parameters
+
+You can add parameters to the shortcut created above to set additional config. For example you could modify the shortcut to look like the following:
+```
+"C:\tools\folderer\folderer.exe" --ignore--tags
+```
+
+Here are the currently supported parameters you can add:
+- `--ignore-tags`
+  - Ignores square brackets and text between them in file names. (For example `[MyTag]fileName.txt` would be processed as if the file was just `fileName.txt`)
+
 ### Optional: Building folderer.exe yourself
 
 - Install [nodejs](https://nodejs.org/en/download/) if you have not already installed it
@@ -26,7 +38,7 @@ This version of file folderer has no UI of it's own, but is instead intended to 
 ## Usage
 
 
-Once you install the application you can use it in the following way.
+Once you install and configure the application you can use it in the following way.
 
 - Select a file or files in the windows file explorer and right click to bring up the context menu.
 - In the context menu select `Send to` > `folderer` (or` folderer.exe`)
