@@ -26,8 +26,13 @@ You can add parameters to the shortcut created above to set additional config. F
 ```
 
 Here are the currently supported parameters you can add:
-- `--ignore-tags`
-  - Ignores square brackets and text between them in file names. (For example `[MyTag]fileName.txt` would be processed as if the file was just `fileName.txt`)
+- `--no-tag`
+  - Does not include square brackets and text between when generating folder names. (For example `[MyTag]fileName.txt` and would `[MyTag]fileName 2.txt` be placed in a new folder called `fileName` as opposed to `[MyTag]fileName`)
+- `--no-trailing-zero`
+  - Does not include trailing zeroes when generating folder names. (For example `fileName 001.txt` and would `fileName 002.txt` be placed in a new folder called `fileName` as opposed to `fileName 00`)
+- `--no-trailing-dash`
+  - Does not include trailing dashes when generating folder names. (For example `fileName - 1.txt` and would `fileName - 2.txt` be placed in a new folder called `fileName` as opposed to `fileName -`)
+  - Note: This may be used with `--no-trailing-zero`. (For example `fileName - 01.txt` and would `fileName - 02.txt` be placed in a new folder called `fileName` as opposed to `fileName - 0`)
 
 ### Optional: Building folderer.exe yourself
 

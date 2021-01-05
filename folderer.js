@@ -3,12 +3,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const ArgOption = {
-  IGNORE_TAGS: '--ignore-tags',
+// Mapping of arguments to option names
+const argOptions = {
+  '--no-tag': 'noTag',
+  '--no-trailing-zero': 'noTrailingZero',
+  '--no-trailing-dash': 'noTrailingDash',
 };
 
 const defaultOptions = {
-  ignoreTags: false,
+  noTag: false,
+  noTrailingZero: false,
+  noTrailingDash: false,
 };
 
 function main() {
@@ -19,7 +24,7 @@ function main() {
     throw new Error('No file paths provided');
   }
 
-  const fileNames = getFileNames(filePaths, options);
+  const fileNames = getFileNames(filePaths);
   const dirPath = path.dirname(filePaths[0]);
 
   const matchingDirName = findMatchingDirName(fileNames, dirPath);
@@ -30,7 +35,8 @@ function main() {
     if (!targetDirName) {
       throw new Error('Unable to determine common folder name.');
     }
-    moveFiles(filePaths, targetDirName);
+    const formattedDirName = formatDirName(targetDirName, options);
+    moveFiles(filePaths, formattedDirName);
   } else {
     throw new Error('Unable to move file(s) to folder.');
   }
@@ -72,8 +78,10 @@ function parseScriptArgs(scriptArgs) {
   const filePaths = [];
   scriptArgs.forEach((arg) => {
     if (arg.startsWith('-')) {
-      if (arg.toLowerCase() === ArgOption.IGNORE_TAGS) {
-        options.ignoreTags = true;
+      const argLower = arg.toLowerCase();
+      if (argOptions[argLower]) {
+        const optionName = argOptions[argLower];
+        options[optionName] = true;
       } else {
         throw new Error(`Unrecognized option "${arg}"`);
       }
@@ -85,15 +93,10 @@ function parseScriptArgs(scriptArgs) {
 }
 
 // Given a list of fle paths returns a list of file names (with no file extension)
-function getFileNames(filePaths, options) {
-  return filePaths.map((filePath) => {
-    let fileName = path.parse(filePath).name;
-    if (options.ignoreTags) {
-      // Remove square bracket [tags] from the filename
-      fileName = fileName.replace(/(\[.*?\])/g, '');
-    }
-    return fileName;
-  });
+function getFileNames(filePaths) {
+  return filePaths.map((filePath) => (
+    path.parse(filePath).name
+  ));
 }
 
 // Given a list of files paths (assumed to be in the same directory) returns a folder in the same
@@ -166,6 +169,25 @@ function getSubStrings(str, size) {
 
 function allIncludes(stringList, targetStr) {
   return stringList.every((str) => (str.includes(targetStr)));
+}
+
+// returns the dir name formatted based on the passed in options
+function formatDirName(dirName, options) {
+  let formattedDirName = dirName;
+  if (options.noTag) {
+    // Remove square bracket [tags] from the filename
+    formattedDirName = formattedDirName.replace(/(\[.*?\])/g, '');
+  }
+
+  if (options.noTrailingZero && options.noTrailingDash) {
+    formattedDirName = formattedDirName.replace(/([ ]*[-0])*$/g, '');
+  } else if (options.noTrailingZero) {
+    formattedDirName = formattedDirName.replace(/([ ]*[0])*$/g, '');
+  } else if (options.noTrailingDash) {
+    formattedDirName = formattedDirName.replace(/([ ]*[-])*$/g, '');
+  }
+
+  return formattedDirName;
 }
 
 main();

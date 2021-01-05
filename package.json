@@ -1,6 +1,6 @@
 {
   "name": "folderer",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "A tool for sorting files into folders",
   "main": "folderer.js",
   "scripts": {
