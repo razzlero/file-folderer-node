@@ -22,7 +22,7 @@ This version of file folderer has no UI of it's own, but is instead intended to 
 
 You can add parameters to the shortcut created above to set additional config. For example you could modify the shortcut to look like the following:
 ```
-"C:\tools\folderer\folderer.exe" --ignore--tags
+"C:\tools\folderer\folderer.exe" --no--tag --no-trailing-zero --no-trailing-dash
 ```
 
 Here are the currently supported parameters you can add:
